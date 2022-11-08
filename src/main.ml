@@ -132,14 +132,88 @@ let pack list =
 (* Problem 10: run-length encoding *)
 let rle list =
     let rec aux prev count acc = function
-        | []     -> if count != 0 then [count; prev] :: acc
+        | []     -> if count != 0 then (count, prev) :: acc
                     else acc
         | h :: t -> if (h = prev) then (aux prev (count + 1) acc t) 
-                    else (aux h 1 (if count != 0 then ([count; prev] :: acc)
+                    else (aux h 1 (if count != 0 then ((count, prev) :: acc)
                                    else acc) 
                           t)
     in
     rev (aux 0 0 [] list)
 ;;
 
-print_2d_int_array (Some (rle [1;2;2;3;3;3;4;4;4;4;5;5;5;5;5;1]));;
+(* Problem 11: Modified run-length encoding *)
+type 'a rle_node =
+    | One of 'a
+    | Many of int * 'a
+;;
+
+let encode list =
+    let rec aux prev count acc = function
+        | []     ->
+            if count != 0 then
+              (if count = 1 then One prev :: acc
+               else Many (count, prev) :: acc)
+           else acc
+      | h :: t ->
+            if (h = prev) then (aux prev (count + 1) acc t)
+            else (aux h 1 (if count != 0 then
+                             (if count = 1 then One prev :: acc
+                              else Many (count, prev) :: acc)
+                           else acc) t)
+    in
+    rev (aux 0 0 [] list)
+;;
+
+(* Problem 12: decode the above encoding *)
+let decode list =
+    let rec aux count acc = function
+        | []                    -> acc
+        | One h :: t            -> aux 0 (h :: acc) t
+        | Many (c, x) :: t as w ->
+            if (count = c) then aux 0 acc t
+            else aux (count + 1) (x :: acc) w
+    in
+    rev (aux 0 [] list)
+;;
+
+(* Problem 13: "Direct solution" to run-length encoding 
+ * honestly don't really get what they want me to do differently
+ * from problem 11, so im skipping it*)
+
+(* Problem 14: Duplicate elements of a list (TR) *)
+let duplicate list =
+    let rec aux acc = function
+        | []     -> acc
+        | h :: t -> aux (h :: h :: acc) t
+    in
+     rev (aux [] list)
+;;
+
+(* Problem 15: Replicate elements of a list N times (TR) *)
+let replicate list n =
+    let rec aux count acc = function
+        | []     -> acc
+        | h :: t as w-> 
+            if (count = n) then aux 0 acc t
+            else aux (count + 1) (h :: acc) w
+    in
+     rev (aux 0 [] list)
+;;
+(* Arguably a cleaner way of doing problem 15 *)
+let replicate2 list n =
+    let rec prepend n acc x =
+        if n = 0 then acc else prepend (n - 1) (x :: acc) x
+    in
+    List.fold_left (prepend n) [] (rev list)
+;;
+
+(* Problem 16: Drop every Nth element from a list 
+ * using a filter instead of recursion this time, need to
+ * get more comfortable with the list library for AoC/PE *)
+let drop list n =
+    let decide i _ =
+        if (i+1) mod n = 0 then false else true
+    in
+     List.filteri decide list
+;;
