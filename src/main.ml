@@ -1,8 +1,6 @@
 (* All solutions are in the same order as they 
  * appear on the website - top to bottom *)
 
-open Core
-
 (* Some useful functions *)
 
 (* Print various optionals *)
@@ -13,6 +11,10 @@ let print_int = function
 let print_string = function
     | None   -> print_endline "<empty string>"
     | Some s -> print_endline s
+;;
+let print_bool = function
+    | false -> print_endline "false"
+    | true  -> print_endline "true"
 ;;
 let rec print_int_array = function
     | None    -> print_endline "<empty array>"
@@ -41,22 +43,32 @@ let rec last_two = function
     | _ :: l -> last_two l
 ;;
 
-(* Problem 3: get the n-th element of a list (tail-recursive) *)
-let nth n l = 
-    let rec aux i = function
-        | [] -> None
-        | h :: t -> (if i = n then Some h
-                     else aux (i + 1) t)
+(* Problem 3: get the n-th element of a list *)
+let rec nth i = function
+    | [] -> None
+    | h :: t -> if i = 0 then Some h else nth (i - 1) t;;
+
+(* Problem 4: get the length of a list (TR) *)
+let length l =
+    let rec aux n = function
+      | [] -> n
+      | _ :: t -> aux (n + 1) t
     in
     aux 0 l
 ;;
 
-(* Problem 4: get the length of a list (tail-recursive) *)
-let length l =
-    let rec aux n = function
-        | [] -> n
-        | _ :: t -> aux (n + 1) t
+(* Problem 5: reverse a list (TR) *)
+let rev l =
+    let rec aux acc = function
+      | [] -> acc
+      | h :: t -> aux (h :: acc) t
     in
-    aux 0 l  
+    aux [] l
+;; 
+
+(* Problem 6: check if a list is a palindrome *)
+let is_palindrome l =
+    l = rev l
 ;;
 
+print_bool (is_palindrome [1;2;3])
