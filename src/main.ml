@@ -41,16 +41,22 @@ let rec last_two = function
     | _ :: l -> last_two l
 ;;
 
-(* Problem 3: get the n-th element of a list *)
-let rec nth n = function
-    | [] -> None
-    | h :: t -> (if n = 0 then Some h
-                 else nth (n - 1) t)
+(* Problem 3: get the n-th element of a list (tail-recursive) *)
+let nth n l = 
+    let rec aux i = function
+        | [] -> None
+        | h :: t -> (if i = n then Some h
+                     else aux (i + 1) t)
+    in
+    aux 0 l
 ;;
 
-(* Problem 4: get the length of a list (todo: make it tail recursive) *)
-let rec length = function
-    | [] -> 0
-    | _ :: t -> (length  t) + 1
+(* Problem 4: get the length of a list (tail-recursive) *)
+let length l =
+    let rec aux n = function
+        | [] -> n
+        | _ :: t -> aux (n + 1) t
+    in
+    aux 0 l  
 ;;
 
