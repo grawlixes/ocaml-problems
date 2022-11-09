@@ -215,5 +215,73 @@ let drop list n =
     let decide i _ =
         if (i+1) mod n = 0 then false else true
     in
-     List.filteri decide list
+    List.filteri decide list
+;;
+
+(* Problem 17: split a list into two parts, given size *)
+let split list n =
+    let decide i _ =
+        if i < n then true else false
+    in
+    (List.filteri decide list, 
+     List.filteri (fun i x -> not (decide i x)) list)
+;;
+
+(* Problem 18: extract a slice from a list *)
+let slice list i j =
+    let rec aux n acc = function
+        | []     -> acc
+        | h :: t -> if (n = j) then (h :: acc)
+                    else if (i <= n) then aux (n+1) (h :: acc) t
+                    else aux (n+1) acc t
+    in
+    rev (aux 0 [] list)
+;;
+
+(* Problem 19: rotate a list N places to the left *)
+let rotate list n =
+    let rec aux acc1 acc2 rem = function
+        | []     -> (rev acc2) @ (rev acc1)
+        | h :: t -> if (rem > 0) then aux (h :: acc1) acc2 (rem - 1) t
+                    else aux acc1 (h :: acc2) rem t
+    in
+     rev (aux [] [] n list)
+;;
+
+(* Problem 20: remove kth element from list *)
+let remove_at list i =
+    let decide j _ =
+        if i = j then false else true
+    in
+    List.filteri decide list
+;;
+
+(* Problem 21: insert element into kth position *)
+let insert_at list i v =
+    let rec aux acc j = function
+        | [] -> if (j <= i) then (v :: acc) else acc
+        | h :: t as w -> if (i = j) then aux (v :: acc) (j + 1) w
+                         else aux (h :: acc) (j + 1) t
+    in
+     List.rev (aux [] 0 list)
+;;
+
+(* Problem 22: range function (inc or dec) 
+ * it's a bit ugly but I'm proud of this one,
+ * I write a generic range function and just re-call
+ * it with a negative (optional) increment if i > j 
+ * - one weird thing is that calling range with d
+ *   seems to "flip" i and j for some reason, so
+ *   while it seems like I should call range j i,
+ *   I actually have to call range i j when flipping 
+ * need to be careful with optional arguments in ocaml *)
+let rec range ?(d = 1) i j =
+    if ((d = 1) && (i > j)) then
+        (range i j ~d: (-1))
+    else
+        let rec aux acc cur = function
+            | 0 -> acc
+            | x -> aux (cur :: acc) (cur + d) (x - 1)
+        in
+         List.rev (aux [] i (abs (j - i) + 1))
 ;;
